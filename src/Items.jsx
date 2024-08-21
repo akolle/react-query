@@ -3,14 +3,30 @@ import SingleItem from './SingleItem'
 import customFetch from './utils'
 
 const Items = ({ items }) => {
-  const result = useQuery({
+  const { isLoading, data, error, isError } = useQuery({
     queryKey: ['tasks'],
-    queryFn: () => customFetch.get('/'),
+    queryFn: async () => {
+      const { data } = await customFetch.get('/something')
+      return data
+    },
   })
-  console.log(result)
+
+  if (isLoading) {
+    return <p style={{ marginTop: '1rem' }}>Loading...</p>
+  }
+
+  // if (isError) {
+  //   return <p style={{ marginTop: '1rem' }}>There was an error...</p>
+  // }
+
+  if (error) {
+    return <p style={{ marginTop: '1rem' }}>{error.response.data}</p>
+  }
+
+  console.log(data)
   return (
     <div className="items">
-      {items.map((item) => {
+      {data.taskList.map((item) => {
         return <SingleItem key={item.id} item={item} />
       })}
     </div>
